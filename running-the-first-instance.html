@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>Running the first instance</title>
+        <link rel="stylesheet" href="https://berengeremathieupro.github.io/experiment_logbook/theme/css/main.css" />
+        <meta name="description" content="Simply follow the official documentation. Use Perplexity AI for powershell black magic. Perplexity AI how to give read and write access to a..." />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="https://berengeremathieupro.github.io/experiment_logbook/">Becoming Zope contributor using generative AI</a></h1>
+                <nav><ul>
+                    <li><a href="https://berengeremathieupro.github.io/experiment_logbook/index.html">Home</a></li>
+                    <li><a href="https://berengeremathieupro.github.io/experiment_logbook/about.html">About me</a></li>
+                    <li><a href="https://berengeremathieupro.github.io/experiment_logbook/roadmap.html">Roadmap</a></li>
+                    <li><a href="https://berengeremathieupro.github.io/experiment_logbook/category/notes">Notes</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="https://berengeremathieupro.github.io/experiment_logbook/running-the-first-instance.html" rel="bookmark"
+           title="Permalink to Running the first instance">Running the first instance</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2024-07-27T00:00:00+02:00">
+                Published: sam. 27 juillet 2024
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="https://berengeremathieupro.github.io/experiment_logbook/author/berengere-mathieu.html">Bérengère MATHIEU</a>
+        </address>
+<p>In <a href="https://berengeremathieupro.github.io/experiment_logbook/category/notes.html">notes</a>.</p>
+
+</footer><!-- /.post-info -->      <p>Simply follow the <a href="https://zope.readthedocs.io/en/latest/operation.html#creating-a-zope-instance">official documentation</a>. Use Perplexity AI for powershell black magic.</p>
+<p><img alt="zope is running" src="https://berengeremathieupro.github.io/experiment_logbook/images/zope_running.png"></p>
+<h2>Perplexity AI</h2>
+<blockquote>
+<p>how to give read and write access to a directory using powershell commands </p>
+</blockquote>
+<p>To give read and write access to a directory using PowerShell commands, you can use the following approach:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">$path</span> <span class="p">=</span> <span class="s2">&quot;C:\Path\To\Your\Directory&quot;</span>
+<span class="nv">$identity</span> <span class="p">=</span> <span class="s2">&quot;DOMAIN\Username&quot;</span> <span class="c"># or just &quot;Username&quot; for local users</span>
+<span class="nv">$rights</span> <span class="p">=</span> <span class="s2">&quot;ReadAndExecute, Write&quot;</span>
+
+<span class="nv">$acl</span> <span class="p">=</span> <span class="nb">Get-Acl</span> <span class="nv">$path</span>
+<span class="nv">$rule</span> <span class="p">=</span> <span class="nb">New-Object</span> <span class="n">System</span><span class="p">.</span><span class="n">Security</span><span class="p">.</span><span class="n">AccessControl</span><span class="p">.</span><span class="n">FileSystemAccessRule</span><span class="p">(</span><span class="nv">$identity</span><span class="p">,</span> <span class="nv">$rights</span><span class="p">,</span> <span class="s2">&quot;Allow&quot;</span><span class="p">)</span>
+<span class="nv">$acl</span><span class="p">.</span><span class="n">SetAccessRule</span><span class="p">(</span><span class="nv">$rule</span><span class="p">)</span>
+<span class="nb">Set-Acl</span> <span class="nv">$path</span> <span class="nv">$acl</span>
+</code></pre></div>
+
+<p>Here's what this script does:</p>
+<ol>
+<li>Set the <code>$path</code> variable to the directory you want to modify.</li>
+<li>Specify the user or group in the <code>$identity</code> variable.</li>
+<li>Define the permissions you want to grant in the <code>$rights</code> variable.</li>
+<li>Get the current Access Control List (ACL) for the directory.</li>
+<li>Create a new access rule.</li>
+<li>Add the new rule to the ACL.</li>
+<li>Apply the modified ACL back to the directory[1][2].</li>
+</ol>
+<p>If you want to apply these permissions recursively to all subdirectories and files, you can add:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">Get-ChildItem</span> <span class="n">-Path</span> <span class="nv">$path</span> <span class="n">-Recurse</span> <span class="n">-Force</span> <span class="p">|</span> <span class="k">ForEach</span><span class="n">-Object</span> <span class="p">{</span>
+    <span class="nv">$acl</span> <span class="p">=</span> <span class="nb">Get-Acl</span> <span class="nv">$_</span><span class="p">.</span><span class="n">FullName</span>
+    <span class="nv">$acl</span><span class="p">.</span><span class="n">SetAccessRule</span><span class="p">(</span><span class="nv">$rule</span><span class="p">)</span>
+    <span class="nb">Set-Acl</span> <span class="nv">$_</span><span class="p">.</span><span class="n">FullName</span> <span class="nv">$acl</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This will apply the same permissions to all child items in the directory[2].</p>
+<p>Remember to run PowerShell as an administrator when modifying permissions, especially for system directories, as it can affect system stability and security[2][3].</p>
+<p>For more complex scenarios, you can adjust the <code>$rights</code> variable. For example, to grant full control, you would use <code>"FullControl"</code> instead of <code>"ReadAndExecute, Write"</code>[4].</p>
+<p>Citations:
+[1] https://gist.github.com/yetanotherchris/200a70840a21d3c8fa9ef30f448e48b0
+[2] https://petri.com/how-to-use-powershell-to-manage-folder-permissions/
+[3] https://blog.netwrix.com/2018/04/18/how-to-manage-file-system-acls-with-powershell-scripts/
+[4] https://stackoverflow.com/questions/25779423/powershell-to-set-folder-permissions
+[5] https://learn.microsoft.com/en-us/powershell/scripting/samples/working-with-files-and-folders?view=powershell-7.4</p>
+<h2>Done</h2>
+<p>All this stuff to a simple <code>ls -l</code>...  Finally, I don't need to add permission.</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="n">Get</span><span class="o">-</span><span class="n">ACL</span><span class="w"> </span><span class="o">-</span><span class="n">Path</span><span class="w"> </span><span class="s2">&quot;var&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">Access</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Format</span><span class="o">-</span><span class="n">Table</span><span class="w"> </span><span class="n">IdentityReference</span><span class="p">,</span><span class="n">FileSystemRights</span><span class="p">,</span><span class="n">AccessControlType</span><span class="p">,</span><span class="n">IsInherited</span><span class="p">,</span><span class="n">InheritanceFlags</span><span class="w"> </span><span class="o">-</span><span class="n">AutoSize</span>
+</code></pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.zope.dev/#">Zope</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="https://fr.linkedin.com/in/b%C3%A9reng%C3%A8re-mathieu-491563b2">LinkedIn</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a rel="nofollow" href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a rel="nofollow" href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a rel="nofollow" href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
